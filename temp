@@ -1,9 +1,25 @@
-{ object: 'page',
-  entry: 
-   [ { id: '227178647739997',
-       time: 1483993504766,
-       messaging: 
-        [ { sender: { id: '938822192884253' },
-            recipient: { id: '227178647739997' },
-            timestamp: 1483990192996,
-            message: { mid: 'mid.1483990192996:a6efca0371', seq: 5147, text: 'z' } } ] } ] }
+{ recipient: { id: '1234032080023241' },
+  message: 
+   { attachment: 
+      { type: 'template',
+        payload: 
+         { template_type: 'generic',
+           elements: 
+            [ { title: 'Project 1',
+                subtitle: 'Project 1',
+                item_url: 'http://project1.com',
+                image_url: 'logos/1/project1/Amwaj_Logo_new_ai.jpg',
+                buttons: 
+                 [ { type: 'web_url',
+                     url: 'http://project1.com',
+                     title: 'Open Web URL' },
+                   { type: 'postback', title: 'Select', payload: '1' } ] },
+              { title: 'Project 2 ',
+                subtitle: 'Project 2 ',
+                item_url: 'http://project1.com',
+                image_url: 'logos/1/project2/piacera-logo-press.png',
+                buttons: 
+                 [ { type: 'web_url',
+                     url: 'http://project1.com',
+                     title: 'Open Web URL' },
+                   { type: 'postback', title: 'Select', payload: '2' } ] } ] } } } }

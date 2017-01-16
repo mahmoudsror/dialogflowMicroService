@@ -1,0 +1,29 @@
+{ recipient: { id: '1234032080023241' },
+  message: 
+   { attachment: 
+      { type: 'template',
+        payload: 
+         { template_type: 'generic',
+           elements: 
+            [ { title: 'touch',
+                subtitle: 'Your Hands, Now in VR',
+                item_url: 'https://www.oculus.com/en-us/touch/',
+                image_url: 'http://messengerdemo.parseapp.com/img/touch.png',
+                buttons: 
+                 [ { type: 'web_url',
+                     url: 'https://www.oculus.com/en-us/touch/',
+                     title: 'Open Web URL' },
+                   { type: 'postback',
+                     title: 'Call Postback',
+                     payload: 'Payload for second bubble' } ] },
+              { title: 'touch',
+                subtitle: 'Your Hands, Now in VR',
+                item_url: 'https://www.oculus.com/en-us/touch/',
+                image_url: 'http://messengerdemo.parseapp.com/img/touch.png',
+                buttons: 
+                 [ { type: 'web_url',
+                     url: 'https://www.oculus.com/en-us/touch/',
+                     title: 'Open Web URL' },
+                   { type: 'postback',
+                     title: 'Call Postback',
+                     payload: 'Payload for second bubble' } ] } ] } } } }

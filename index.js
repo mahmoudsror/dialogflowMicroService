@@ -4,22 +4,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const request = require('request')
 const app = express()
+const db = require('./db');
 
-
-
-// Index route
-// app.get('/', function (req, res) {
-//     res.send('Hello world, I am a chat bot')
-//     console.log(req)
-// })
-
-// for Facebook verification
-// app.get('/webhook/', function (req, res) {
-//     if (req.query['hub.verify_token'] === 'this_is_my_own_access_token') {
-//         res.send(req.query['hub.challenge'])
-//     }
-//     res.send('Error, wrong token')
-// })
 app.set('port', (process.env.PORT || 3000))
 
 // Process application/x-www-form-urlencoded
@@ -37,74 +23,102 @@ app.listen(app.get('port'), function() {
 
 
 app.post('/', function (req, res) {
-	// console.log('zzzz');
-	// var util = require('util');
-	// var fs = require('fs');
-	// fs.writeFile("/var/www/BOT-HS/temp", util.inspect(req.body, false, null), function(err) {
- //    if(err) {
- //        return console.log(err);
- //    }
- //    console.log("The file was saved!");
-	// }); 
-
-	var data = req.body;
-
+  var data = req.body;
  // Make sure this is a page subscription
  if (data.object === 'page') {
-	    // Iterate over each entry - there may be multiple if batched
-	    data.entry.forEach(function(entry) {
-	      var pageID = entry.id;
-	      var timeOfEvent = entry.time;
+      // Iterate over each entry - there may be multiple if batched
+      data.entry.forEach(function(entry) {
+        var pageID = entry.id;
+        var timeOfEvent = entry.time;
+        // Attributes to be added via migrations 
+        // var MISR_ITALIA = "227178647739997";
+        // var MISR_ITALIA_MESSAGE = "Welcome to Misr-italia :) ";
+        // var MISR_ITALIA_PID = 1 ;
 
-	      // Iterate over each messaging event
-	      entry.messaging.forEach(function(event) {
-	        if (event.message) {
-	          receivedMessage(event);
-	        }
-	         else if (event.postback) {
+        // console.log(pageID);
+        
+        // Iterate over each messaging event
+        entry.messaging.forEach(function(event) {
+          if (event.message) {
+             // console.log(iterativeArrayObjs);
+             var SELECT_SYSTEM_QUERY  = {facebookPageId:pageID};
+                var iterativeArrayObjs = [];
+                db.query('SELECT  id,systemName,facebookPageId FROM  systems WHERE ?', SELECT_SYSTEM_QUERY, function(err, result) {
+                  if (err) throw err;
+                  // console.log(result[0].id);
+                  var SELECT_PROJECT_QUERY  = {systemId:result[0].id};
+                  var iterativeArrayObjs = [];
+                  db.query('SELECT  id ,projectName title,projectSubtitle subtitle,projectLink item_url,projectImage image_url FROM projects WHERE ?', SELECT_PROJECT_QUERY, function(err, system_result) {
+                      if (err) throw err;
+                      // console.log(system_result);
+                       for (var i = 0; i < system_result.length; i++) {
+                          var temp = createIterativeObj(system_result[i],"project");
+                          iterativeArrayObjs.push(temp);
+                        }
+                        receivedMessage(event,iterativeArrayObjs,result);
+                    });
+                });
+          }
+           else if (event.postback) {
              receivedPostback(event); 
-   		    }
-	         else {
-	          console.log("Webhook received unknown event: ", event);
-	        }
-	      });
-	    });
+          }
+           else {
+            // console.log("Webhook received unknown event: ", event);
+          }
+        });
+      });
 
-	    // Assume all went well.
-	    //
-	    // You must send back a 200, within 20 seconds, to let us know
-	    // you've successfully received the callback. Otherwise, the request
-	    // will time out and we will keep trying to resend.
-	    res.sendStatus(200);
-	 }
+      // Assume all went well.
+      //
+      // You must send back a 200, within 20 seconds, to let us know
+      // you've successfully received the callback. Otherwise, the request
+      // will time out and we will keep trying to resend.
+      res.sendStatus(200);
+   }
 });
-  
-function receivedMessage(event) {
+
+
+app.get('/', function (req, res) {
+    // console.log('test get methof');
+});
+function receivedMessage(event,projectSections,sytstemObj) {
   // Putting a stub for now, we'll expand it in the following steps
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
   var message = event.message;
 
-  console.log("Received message for user %d and page %d at %d with message:", 
-    senderID, recipientID, timeOfMessage);
-  console.log(JSON.stringify(message));
+  var MISR_ITALIA_MESSAGE = "Welcome to "+sytstemObj[0].systemName+" :) ";
 
+  // console.log("Receieved message from page %d",recipientID);
+  // console.log("Received message for user %d and page %d at %d with message:", 
+  //   senderID, recipientID, timeOfMessage);
+  // console.log("Received message from page %d ", recipientID);
+  // console.log( event.recipient);
+  // console.log(JSON.stringify(message));
   var messageId = message.mid;
-
   var messageText = message.text;
   var messageAttachments = message.attachments;
 
   if (messageText) {
+    messageText = messageText.toLowerCase();
     // If we receive a text message, check to see if it matches a keyword
     // and send back the example. Otherwise, just echo the text we received.
     switch (messageText) {
-      case 'generic':
-        sendGenericMessage(senderID);
+      // case 'generic':
+      //   sendGenericMessage(senderID,projectSections);
+      //   break;
+
+      case 'hi':
+      case 'hello':
+      case 'hey':
+        sendTextMessage(senderID,MISR_ITALIA_MESSAGE);
+        sendGenericMessage(senderID,projectSections);
+
         break;
 
       default:
-        sendTextMessage(senderID, messageText);
+        sendTextMessage(senderID,messageText);
     }
   } else if (messageAttachments) {
     sendTextMessage(senderID, "Message with attachment received");
@@ -119,16 +133,41 @@ function receivedPostback(event) {
 
   // The 'payload' param is a developer-defined field which is set in a postback 
   // button for Structured Messages. 
-  var payload = event.postback.payload;
+  console.log(event.postback.payload);
+  var payload_arr_split = event.postback.payload.split("_");
+  var item_id = payload_arr_split[1];
 
-  console.log("Received postback for user %d and page %d with payload '%s' " + 
-    "at %d", senderID, recipientID, payload, timeOfPostback);
+  var SELECT_ITEM_QUERY = {projectId:item_id};
+  if(payload_arr_split[0]=="project"){
+      var iterativeArrayObjs = [];
+            db.query('SELECT  id ,unitName title,unitSubtitle subtitle, unitLink item_url,unitImage image_url FROM units WHERE ?', SELECT_ITEM_QUERY, function(err, units_result) {
+              if (err) throw err;
+              for (var i = 0; i < units_result.length; i++) {
+                var temp = createIterativeObj(units_result[i],"unit");
+                iterativeArrayObjs.push(temp);
+              }
+              if(units_result.length>0){
+                sendGenericMessage(senderID,iterativeArrayObjs);
+              }
+            });
 
-  // When a postback is called, we'll send a message back to the sender to 
-  // let them know it was successful
-  sendTextMessage(senderID, "Postback called");
+      var SELECT_PROJECT_QUERY  = {id:item_id};
+            var iterativeArrayObjs = [];
+            db.query('SELECT  id ,projectName FROM projects WHERE ?', SELECT_PROJECT_QUERY, function(err, project_result) {
+                if (err) throw err;
+                  sendTextMessage(senderID, "Here are "+project_result[0].projectName+" units :- ");
+            });
+  }
+  else{
+    var SELECT_ITEM_QUERY = {id:item_id};
+    db.query('SELECT  unitName FROM units WHERE ?', SELECT_ITEM_QUERY, function(err, units_result) {
+              if (err) throw err;
+              if(units_result.length>0){
+                sendTextMessage(senderID,units_result[0].unitName);
+              }
+            });
+    }
 }
-
 
 function sendTextMessage(recipientId, messageText) {
   var messageData = {
@@ -155,8 +194,9 @@ function callSendAPI(messageData) {
       var recipientId = body.recipient_id;
       var messageId = body.message_id;
 
-      console.log("Successfully sent generic message with id %s to recipient %s", 
-        messageId, recipientId);
+      // console.log("Successfully sent generic message with id %s to recipient %s", 
+      //   messageId, recipientId);
+
     } else {
       console.error("Unable to send message.");
       console.error(response);
@@ -165,7 +205,9 @@ function callSendAPI(messageData) {
   });  
 }
 
-function sendGenericMessage(recipientId) {
+function sendGenericMessage(recipientId,iterativeArrayObjs) {
+  // console.log('here in generic FUNC');
+  // console.log(iterativeArrayObjs);
   var messageData = {
     recipient: {
       id: recipientId
@@ -175,39 +217,31 @@ function sendGenericMessage(recipientId) {
         type: "template",
         payload: {
           template_type: "generic",
-          elements: [{
-            title: "rift",
-            subtitle: "Next-generation virtual reality",
-            item_url: "https://www.oculus.com/en-us/rift/",               
-            image_url: "http://messengerdemo.parseapp.com/img/rift.png",
-            buttons: [{
-              type: "web_url",
-              url: "https://www.oculus.com/en-us/rift/",
-              title: "Open Web URL"
-            }, {
-              type: "postback",
-              title: "Call Postback",
-              payload: "Payload for first bubble",
-            }],
-          }, {
-            title: "touch",
-            subtitle: "Your Hands, Now in VR",
-            item_url: "https://www.oculus.com/en-us/touch/",               
-            image_url: "http://messengerdemo.parseapp.com/img/touch.png",
-            buttons: [{
-              type: "web_url",
-              url: "https://www.oculus.com/en-us/touch/",
-              title: "Open Web URL"
-            }, {
-              type: "postback",
-              title: "Call Postback",
-              payload: "Payload for second bubble",
-            }]
-          }]
+          elements: iterativeArrayObjs
         }
       }
     }
-  };  
+  };
 
   callSendAPI(messageData);
+}
+
+function createIterativeObj(iterativeObj,iterative_type){
+ var GLOBAL_PATH = "https://m.epsilonsocial.com/";
+ var obj = {
+            title: iterativeObj.title,
+            subtitle: iterativeObj.subtitle,
+            item_url: iterativeObj.item_url,               
+            image_url: GLOBAL_PATH+iterativeObj.image_url,
+            buttons: [{
+              type: "web_url",
+              url: iterativeObj.item_url,
+              title: "Open Web URL"
+            }, {
+              type: "postback",
+              title: "Select",
+              payload: iterative_type+"_"+iterativeObj.id,
+            }]
+          };
+          return obj ;
 }
