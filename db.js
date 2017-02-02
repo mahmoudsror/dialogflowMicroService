@@ -1,13 +1,13 @@
-var mysql = require('mysql');
-var connection = mysql.createConnection({
-    host     : '127.0.0.1',
-    user     : 'root',
-    password : 'xwwx1111',
-    database : 'botbackenddb'
-});
 
-connection.connect(function(err) {
-    if (err) throw err;
-});
+var sequelize = require('sequelize');
+sequelize = new sequelize('botbackenddb', 'root', '9c95YY', {
+  host: '127.0.0.1',
+  dialect: 'mysql',
 
-module.exports = connection;
+  pool: {
+    max: 5,
+    min: 0,
+    idle: 10000
+  },
+});
+module.exports = sequelize;

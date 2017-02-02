@@ -20,6 +20,8 @@
     "express": "^4.14.0",
     "fs": "0.0.1-security",
     "request": "^2.79.0",
+    "sequelize": "^3.30.0",
+    "sequelize-cli": "^2.5.1",
     "util": "^0.10.3"
   }
 }
