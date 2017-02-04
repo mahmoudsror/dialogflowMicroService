@@ -34,10 +34,11 @@ app.post('/', function (req, res) {
 				//var system_id=0;
 				var system_id;
 				var iterativeArrayObjs = [];
-								var timeOfEvent = entry.time;
+				var timeOfEvent = entry.time;
 				// Iterate over each messaging event
 				entry.messaging.forEach(function(event) {
 					if (event.message) {
+						//console.log(event);
 						var senderID = event.sender.id;
 						var event_text = event.message.text;
 				 //         console.log(event.message.text);
@@ -49,22 +50,28 @@ app.post('/', function (req, res) {
 					}).then(function(result) {
 						system_id = result['dataValues']['id'];
 						models.tags.findOne({
-					include:[
-
-					{
-						model: models.answers,
-						as:'tags_answers',
-					},
-					
-					],
-					where:{tag:event_text}
-					}).then(function(result) {
-						var answer_obj = result['dataValues']['tags_answers'];
-						for (var i=0;i<answer_obj.length;i++) {
-  							var item = answer_obj[i]['dataValues']['answer'];
-  							sendTextMessage(senderID,item);
-						}
-					});
+							include:[
+		/*					{
+								model: models.systems,
+								as:'system_tags',
+							},*/
+							{
+								model: models.answers,
+								as:'tags_answers',
+							},
+							
+							],
+							where:{tag:event_text}
+							}).then(function(result) {
+								console.log(result);
+								var answer_obj = result['dataValues']['tags_answers'];
+								
+								for (var i=0;i<answer_obj.length;i++) {
+		  							var item = answer_obj[i]['dataValues']['answer'];
+		  							
+		  							sendTextMessage(senderID,item);
+								}
+							});
 
 
 
@@ -390,12 +397,12 @@ function remove_presistent_menu(messageData) {
 	});  
 }*/
 function callSendAPI(messageData) {
-
+console.log(messageData);
 	addPersistentMenu();
 	
 	request({
 		uri: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: { access_token: "EAAPEfNPu1PQBAPmJvH75WRnUQrAlJhpvIcNm1RFgKtD4IHog2yZBGRLi4QzKnNoovhi6ETwQWm1QKOPFBWoXWxrJYUqt0IZBfgkv82flmfekpH5IpUl4dk21Pnx4kGGnRxVMUsJbtKOl7bqcj6rGJ0qYPJVx0XwMWEZAcHVYAZDZD" },
+		qs: { access_token: "EAAYbYelkZBUABAH9Xtdvxxeq5qiqd4MN0lYRfg80o1IYAGDovESbV0ZAHmKC9ZAvIB8PPiUnbsEANnou4Lo1YIuurTfZABbmXpwslXNzZAf10X2YjZATZBcSwXZAFX0sKWQr6XeCEvnfkTNsZBECQRrN7XDctF7pZCZB1whDaQYP3ccxAZDZD" },
 		method: 'POST',
 
 
@@ -417,7 +424,7 @@ function callSendAPI(messageData) {
 }
 
 function sendGenericMessage(recipientId,iterativeArrayObjs) {
-console.log(iterativeArrayObjs);
+//console.log(iterativeArrayObjs);
 	var messageData = {
 		recipient: {
 			id: recipientId
@@ -432,6 +439,7 @@ console.log(iterativeArrayObjs);
 			}
 		}
 	};
+
 		callSendAPI(messageData);
 }
 

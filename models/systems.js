@@ -41,13 +41,13 @@ module.exports = function(sequelize, DataTypes) {
         // associations can be defined here
 /*        project.hasMany(models.units,{foreignKey: "projectId"});
 */
-systems.hasMany(models.projects, {onUpdate: 'CASCADE', foreignKey: 'user_id',as:'system_projects'});
+systems.hasMany(models.projects, {onUpdate: 'CASCADE', foreignKey: 'systemId',as:'system_projects'});
 systems.belongsTo(models.users, {onUpdate: 'CASCADE', foreignKey: 'user_id' ,as:'user_systems'});
 /*systems.hasMany(models.units, {onUpdate: 'CASCADE', foreignKey: 'systemId',as:'system_units'});
 */
 /*--- Tags and system Relation */
         systems.belongsToMany( models.tags, { as: 'taggables',through: 'taggables',foreignKey: 'tag_id',as:'system_tags' ,otherKey: 'taggable_id'});
-        models.tags.belongsToMany( models.systems, { as: 'taggables',through: 'taggables',foreignKey: 'taggable_id',as:'system_tags'});
+
         /*---------------------------*/
 
       }

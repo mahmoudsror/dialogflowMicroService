@@ -39,7 +39,7 @@ module.exports = function(sequelize, DataTypes) {
 */
 projects.hasMany(models.units, { foreignKey: 'projectId' ,foreignKeyConstraint: true,as:'project_units'});
 projects.belongsTo(models.systems, {foreignKey: 'systemId', foreignKeyConstraint:true,as:'system_projects'});
-projects.belongsToMany(models.tags, {through:'taggables',as:'project_tags'});
+projects.belongsToMany(models.tags, {through:'taggables',foreignKey:'tag_id',as:'project_tags'});
 
       }
     }

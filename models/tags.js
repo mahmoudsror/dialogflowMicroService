@@ -22,7 +22,6 @@ module.exports = function(sequelize, DataTypes) {
 
 				/*--- Tags and system Relation */
 				tags.belongsToMany( models.systems, { as: 'taggables',through: 'taggables',foreignKey: 'tag_id',as:'system_tags'});
-				models.systems.belongsToMany( models.tags, { as: 'taggables',through: 'taggables',foreignKey: 'taggable_id',as:'system_tags'});
 				/*---------------------------*/
 
 				/*Tags and projects */
@@ -37,17 +36,8 @@ module.exports = function(sequelize, DataTypes) {
 
 				/**************************/
 
-			//	models.systems.belongsToMany( models.tags, { as: 'taggables',through: 'taggables',foreignKey: 'taggable_id'});
-				// associations can be defined here
-}
-/*        project.hasMany(models.units,{foreignKey: "projectId"});
-*/
-/*tags.belongsToMany(models.systems, {through:'taggables',foreignKey:'tag_id'});
-*/
 
-/*tags.belongsToMany( models.systems, { as: 'taggables',through: 'taggables',foreignKey: 'tag_id'});
-*//*tags.belongsToMany(models.project, {throught:'taggables',as:'project_tags'});
-tags.belongsToMany(models.units, {throught:'taggables',as:'units_tags'});*/
+}
 
 			}
 		}
