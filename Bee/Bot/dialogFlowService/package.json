@@ -1,0 +1,24 @@
+{
+  "name": "dialogflowservice",
+  "version": "1.0.0",
+  "description": "dialogflow chatbot ",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Mahmoud Ahmed",
+  "license": "ISC",
+  "homepage": "",
+  "dependencies": {
+    "amqplib": "^0.5.2",
+    "apiai": "^4.0.3",
+    "cors": "^2.8.4",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "validator": "^10.4.0"
+  }
+}
